@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,7 +22,10 @@ namespace DbfTests
 
             // put all DataValues into ONE ordered (by timestamp) list of OutputRow (each timestamp shall exist only once, each file should be like a column)
             // the OutputRow has 2 lists: 1 static one for the headers (directory path of file) and one for the values (values of all files (same timestamp) must be merged into one OutputRow)
-            var outputs = new List<OutputRow>();
+            //var outputs = new List<OutputRow>();
+
+            var sut = new DbfFileMerger();
+            var outputs = sut.MergeFiles(RootDir, RelevantFileName);
 
             // if there is time left, improve example where you think it isn't good enough
 
