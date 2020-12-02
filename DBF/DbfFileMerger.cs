@@ -27,13 +27,11 @@ namespace DbfTests
                     }
                     else
                     {
-                        var newOutputRow = new OutputRow
+                        sortedOutputRows.Add(valueRow.Timestamp, new OutputRow
                         {
                             Timestamp = valueRow.Timestamp,
                             Values = new List<double?>(new double?[numberOfFiles]) { [currentFile] = valueRow.Value }
-                        };
-
-                        sortedOutputRows.Add(valueRow.Timestamp, newOutputRow);
+                        });
                     }
                 }
                 currentFile++;
