@@ -10,18 +10,16 @@ namespace DbfTests
         public IList<OutputRow> MergeFiles(string sourceDirectory, string fileName)
         {
             var dbfFiles = Directory.EnumerateFiles(sourceDirectory, fileName, SearchOption.AllDirectories);
-
             var sortedOutputRows = new SortedList<DateTime, OutputRow>();
             var numberOfFiles = dbfFiles.Count();
             var currentFile = 0;
+            var dbfReader = new DbfReader();
 
             foreach (var dbfFile in dbfFiles)
             {
-                var directoryName = Path.GetDirectoryName(dbfFile);
-                OutputRow.Headers.Add(directoryName);
-                var valueRows = this.ReadDbfFile(dbfFile);
+                OutputRow.Headers.Add(Path.GetDirectoryName(dbfFile));
                 
-                foreach (var valueRow in valueRows)
+                foreach (var valueRow in dbfReader.ReadValues(dbfFile))
                 {
                     if (sortedOutputRows.TryGetValue(valueRow.Timestamp, out var outputRow))
                     {
@@ -32,13 +30,8 @@ namespace DbfTests
                         var newOutputRow = new OutputRow
                         {
                             Timestamp = valueRow.Timestamp,
-                            Values = new List<double?>(numberOfFiles)
+                            Values = new List<double?>(new double?[numberOfFiles]) { [currentFile] = valueRow.Value }
                         };
-                        for (int i = 0; i < numberOfFiles; i++)
-                        {
-                            newOutputRow.Values.Add(null);
-                        }
-                        newOutputRow.Values[currentFile] = valueRow.Value;
 
                         sortedOutputRows.Add(valueRow.Timestamp, newOutputRow);
                     }
@@ -47,12 +40,6 @@ namespace DbfTests
             }
 
             return sortedOutputRows.Values;
-        }
-
-        private IList<DbfReader.ValueRow> ReadDbfFile(string dbfFilePath)
-        {
-            var reader = new DbfReader();
-            return reader.ReadValues(dbfFilePath);
         }
     }
 }
